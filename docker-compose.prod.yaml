@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  bot:
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 30s

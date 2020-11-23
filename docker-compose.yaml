@@ -1,0 +1,8 @@
+version: "3.8"
+
+services:
+  bot:
+    build: .
+    image: "among-us-discord:0.1.0"
+    env_file:
+      - .env
