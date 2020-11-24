@@ -1,6 +1,10 @@
 # VSCode settings
 .vscode/
 
+# Image files to avoid copyright
+*.png
+*.jpg
+
 # Environment files
 .envrc
 .env

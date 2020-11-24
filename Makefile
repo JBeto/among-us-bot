@@ -4,6 +4,7 @@ build:
 	@sudo docker-compose build
 
 run:
+	@sudo docker-compose build
 	@sudo docker-compose up
 
 run-prod:
