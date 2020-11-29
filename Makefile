@@ -8,7 +8,11 @@ run:
 	@sudo docker-compose up
 
 run-prod:
-	@sudo docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d
+	@docker-compose --context discord build
+	@docker-compose --context discord -f docker-compose.yaml -f docker-compose.prod.yaml up -d
 
 clean:
 	@sudo docker-compose down
+
+clean-prod:
+	@docker-compose --context discord down

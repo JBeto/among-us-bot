@@ -4,6 +4,7 @@ import among.config as config
 
 # Setup intents
 intents = discord.Intents.none()
+intents.voice_states = True
 intents.guilds = True
 intents.messages = True
 
@@ -13,8 +14,8 @@ HELP_DESCRIPTION = """
 Among Us Discord bot to automate muting/unmuting and showing game maps.
 
 Commands:
-  - !among mute    # Mute everyone in voice channel w/ same name & category
-  - !among meet    # Unmute everyone in voice channel w/ same name & category
+  - !among mute    # Mute everyone in same voice channel
+  - !among meet    # Unmute everyone in same voice channel
   - !among skeld   # Show Skeld game map and connected vents/paths
   - !among mira    # Show Mira HQ game map and connected vents/paths
   - !among polus   # Show Polus game map and connected vents/paths
@@ -35,35 +36,34 @@ async def among(ctx):
         # By default, display help menu if command is invalid
         await ctx.send(HELP_DESCRIPTION)
 
-def _get_corresponding_voice_channel(ctx):
-    name = ctx.channel.name
-    category = ctx.channel.category
-    if category is None: # Search in guild for voice_channel
-        return next((x for x in ctx.guild.voice_channels if x.name == name), None)
-    else: # Search in respective category
-        return next((x for x in category.voice_channels if x.name == name), None)
-
 @among.command(name='mute')
 async def _mute(ctx):
     """Mute everyone in corresponding voice channel."""
-    voice_channel = _get_corresponding_voice_channel(ctx)
+    voice_channel = ctx.author.voice.channel if ctx.author.voice else None
     if voice_channel is None:
-        await ctx.send("Dunno which channel to mute! Make sure there's a voice channel w/ the same name and category as this text channel.")
+        print('No voice channel to mute')
+        await ctx.send("Dunno which channel to mute. Make sure you're in a voice channel.")
     else:
+        print('Muting everyone in voice channel: {}'.format(voice_channel))
         for m in voice_channel.members:
             await m.edit(reason="Managing Among Us - muting", mute=True)
+        await ctx.send("Muting everyone in the voice channel. Run `!among meet` to un-mute.")
 
 @among.command(name='meet')
 async def _meet(ctx):
     """Unmute everyone in corresponding voice channel."""
-    voice_channel = _get_corresponding_voice_channel(ctx)
+    voice_channel = ctx.author.voice.channel if ctx.author.voice else None
     if voice_channel is None:
-        await ctx.send("Dunno which channel to unmute! Make sure there's a voice channel w/ the same name and category as this text channel.")
+        print('No voice channel to un-mute')
+        await ctx.send("Dunno which channel to un-mute. Make sure you're in a voice channel.")
     else:
+        print('Un-muting everyone in voice channel: {}'.format(voice_channel))
         for m in voice_channel.members:
             await m.edit(reason="Managing Among Us - unmuting", mute=False)
+        await ctx.send("Talking is allowed again.")
 
 async def _show_map(ctx, name):
+    print('Showing map: {}'.format(name))
     with open(name, 'rb') as fp:
         async with ctx.typing():
             await ctx.send(file=discord.File(fp))
